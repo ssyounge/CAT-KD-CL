@@ -114,12 +114,3 @@
 
 1. **Teacher-Student 기반 Continual Learning 가능성 검증**  
    - Teacher 여러 개의 분리된 지식을 Student 모델이 성공적으로 통합하여 CL을 가능하게 할 수 있는지 분석.
-
-2. **CAT 기반 KD 기법의 효과 검증**  
-   - CAT-KD가 Logit Matching, Feature Matching 등 기존 KD 기법 대비 얼마나 효과적인지 평가.
-
-3. **Teacher 모델 수와 태스크 분배의 영향 분석**  
-   - Teacher 모델 수(num_teachers)가 Student 모델 성능 및 학습 효율성에 미치는 영향을 비교하여 최적 구조 도출.
-
-4. **Regularization 및 Replay 기법의 효과 검증**  
-   - EWC, Exemplar Replay, Data-Free KD와 CAT-KD의 결합으로 성능이 향상되는지 확인.
