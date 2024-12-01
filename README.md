@@ -108,7 +108,17 @@
   1. Lambda EWC
 ![d4a6a46a-e258-474a-a33e-28e8a952fda5](https://github.com/user-attachments/assets/7f6cafa2-fdcd-4991-be87-7c0b4438000d)
 ![bc0bcce0-3d3f-4dd7-a188-3eb9b79e9c9c](https://github.com/user-attachments/assets/79ebbd78-bfbb-4759-9ac9-36f2e17137c9)
-  3. Temperature
-  4. Exemplar Store Size
-  5. Generator Epochs
+
+  2. Temperature
+![4b564f5e-bf93-4680-93e8-92ca39a020f7](https://github.com/user-attachments/assets/7ba57657-d6f1-457f-a6e0-644c4e575f40) 
+![7cb1429d-9942-48e1-b1bf-b15f8de2a3ed](https://github.com/user-attachments/assets/c62f8dc0-2ece-43ee-94bc-a6f5d63279d9)
+
+  3. Exemplar Store Size    
+![e4dbe8b3-3b9e-4318-b4da-8aff6faa5500](https://github.com/user-attachments/assets/66a44bc5-a068-4c5f-b76e-97afb10f5e1b)
+![5a7e21f1-c1d8-4abb-8f77-790e7f0cfdf0](https://github.com/user-attachments/assets/687b5264-e2ff-401b-bc80-490b623e30da)
+ 
+     
+  4. Generator Epochs
+![1480b4a6-929f-4b42-87df-4fa59a7737c0](https://github.com/user-attachments/assets/814b7269-651b-4fdb-a620-adcbace755b1)
+![caacf099-3dad-46b9-860f-ddee2c84a03c](https://github.com/user-attachments/assets/cfbcdd87-d04b-4178-a5f4-fbd51d7f5cd4)
 
