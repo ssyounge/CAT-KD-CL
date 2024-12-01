@@ -7,23 +7,80 @@
 
 ---
 
-## **2. 실험 설정**
-### **데이터셋**
-- **MNIST**: 0-5 클래스는 이전 태스크, 6-9 클래스는 현재 태스크로 설정.
+## **실험 설정**
 
-### **모델**
-- **Teacher 모델**: 이전 태스크에서 학습한 고성능 모델.
-- **Student 모델**: 현재 태스크를 학습하며 Teacher의 지식을 Distillation.
+### **1. 데이터셋**
+- **MNIST**:
+  - 0-5 클래스를 이전 태스크(Task 1), 6-9 클래스를 현재 태스크(Task 2)로 나누어 사용.
+  - 각 태스크에 대해 별도의 데이터셋을 생성하며, `get_task_dataset` 함수를 사용해 클래스별로 데이터를 필터링.
 
-### **평가지표**
-- **Forgetting (`total_forgetting`)**: 이전 태스크 성능의 감소율.
-- **Accuracy (`test_acc`)**: 이전 및 현재 태스크에서의 분류 정확도.
+---
 
-### **주요 변수**
-- `lambda_ewc`: Regularization 강도.
-- `temperature`: Softmax Temperature 조정.
-- `exemplar_store_size`: Exemplar Replay 크기.
-- `generator_num_epochs`: Generator 학습 Epoch.
+### **2. 모델**
+- **Teacher 모델**:
+  - 이전 태스크를 학습한 고성능 모델.
+  - 컨볼루션 레이어와 선형 분류기로 구성된 구조.
+  - Feature Map을 통해 Class Attention Transfer(CAT)에 필요한 정보를 제공합니다.
+- **Student 모델**:
+  - 현재 태스크를 학습하는 모델.
+  - Teacher 모델의 Feature Map과 출력을 Distillation을 통해 학습.
+
+---
+
+### **3. 평가지표**
+- **Forgetting (`total_forgetting`)**:
+  - 이전 태스크 성능의 감소율을 측정.
+  - `forgetting_per_task`를 사용하여 각 태스크별 Forgetting 값을 계산.
+- **Accuracy (`test_acc`)**:
+  - 각 태스크에서의 최종 테스트 정확도를 측정.
+  - 모델의 학습 성능을 평가하는 주요 지표.
+
+---
+
+### **4. 주요 변수**
+- **`lambda_ewc`**:
+  - Elastic Weight Consolidation(EWC)에서 Regularization 강도를 조절.
+  - 값이 클수록 이전 태스크의 지식을 더 강하게 유지.
+- **`temperature`**:
+  - Knowledge Distillation에서 Softmax의 스무딩 효과를 조정하는 온도 매개변수.
+  - 값이 클수록 출력 확률 분포가 부드러워짐.
+- **`exemplar_store_size`**:
+  - Exemplar Replay에서 저장할 샘플의 수.
+  - Replay Method 사용 시 이전 태스크 데이터를 얼마나 많이 저장할지를 결정.
+- **`generator_num_epochs`**:
+  - Generative Replay에서 Generator의 학습 Epoch 수.
+  - Generator가 충분히 학습되도록 제어.
+
+---
+
+### **5. 추가 변수**
+- **Replay Method**:
+  - `None`, `Exemplar`, `Generative` 중 선택.
+  - 이전 태스크 데이터를 직접 Replay하거나 생성된 데이터를 활용.
+- **Regularization Method (`reg_method`)**:
+  - `None`, `EWC`, `SI` 중 선택.
+  - EWC(Elastic Weight Consolidation) 또는 SI(Synaptic Intelligence)를 통해 파라미터의 안정성을 유지.
+
+---
+
+### **6. 생성 모델**
+- **Generator**:
+  - Pseudo Data를 생성하여 Generative Replay를 지원.
+  - 노이즈를 입력으로 받아 MNIST 이미지와 유사한 데이터를 생성.
+
+---
+
+### **7. 하이퍼파라미터**
+- **기본 설정**:
+  - `batch_size=64`
+  - `learning_rate=0.001`
+  - `num_epochs=5`
+  - `temperature=2.0`
+  - `lambda_ewc=1000`
+  - `exemplar_store_size=100`
+  - `generator_num_epochs=10`
+  - `noise_dim=100` (Generator 입력 노이즈 차원)
+
 
 ---
 
