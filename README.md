@@ -1,116 +1,114 @@
-# **Continual Learning with Class Attention Transfer-Based Knowledge Distillation**
-
-## **실험 목적**
-
-본 실험의 목적은 **다수의 Teacher 모델**에서 학습한 지식을 **Knowledge Distillation(KD)**을 통해 Student 모델로 효과적으로 전달하여 **Continual Learning(CL)**을 가능하게 하는 방안을 모색하는 것입니다.
-
-특히, 각 Teacher 모델이 학습한 클래스가 다르고, 이를 결합하여 **Catastrophic Forgetting** 문제를 완화하면서 새로운 태스크를 학습할 수 있는 방법을 검증합니다. 이 과정에서 **Class Attention Transfer(CAT) 기반 KD** 기법을 활용하여, Teacher 모델의 다양한 지식을 Student 모델에 효율적으로 통합하고자 합니다.
-
-본 실험은 MNIST 데이터셋 기반 Continual Learning 환경에서 다음을 중점적으로 분석합니다:
-
-- Teacher 모델의 분리된 지식을 Student 모델이 성공적으로 결합할 수 있는지.
-- CAT 기반 KD가 Logit Matching 및 Feature Matching과 같은 기존 KD 기법 대비 얼마나 효과적인지.
-- Teacher 모델의 수와 태스크 분배가 Student 모델 학습에 미치는 영향을 평가.
-
-이를 통해 **Teacher 여러 개의 지식 결합을 통한 CL 가능성**과 **CAT 기반 KD 기법의 효과성**을 입증하고자 합니다.
+아래는 깃허브 README 형식으로 변환한 내용입니다. 각 섹션을 깔끔하게 정리하여 바로 사용할 수 있도록 작성하였습니다.
 
 ---
 
-## **실험 구조**
+# **Class Attention Transfer 기반 Continual Learning**
 
-### **1. 데이터셋 및 태스크 구성**
-
-- **데이터셋**: MNIST (10개 클래스의 손글씨 숫자 이미지).
-- **태스크 구성**:
-  - 총 **5개의 태스크**, 각 태스크는 **2개의 클래스**로 구성.
-  - 예:
-    - Task 1: 클래스 0, 1.
-    - Task 2: 클래스 2, 3.
-    - ...
-    - Task 5: 클래스 8, 9.
+## **1. 연구 목적**
+- Continual Learning 환경에서 이전 태스크와 현재 태스크를 동시에 해결할 수 있는 Knowledge Distillation(KD) 기법 개발.
+- Class Attention Transfer(CAT)를 활용하여 Forgetting 감소 및 Accuracy 향상을 목표로 함.
+- MNIST 데이터셋을 기반으로 CAT의 효과와 주요 하이퍼파라미터(`lambda_ewc`, `temperature`, `exemplar_store_size`, `generator_num_epochs`)의 영향을 분석.
 
 ---
 
-### **2. 모델 설계**
+## **2. 실험 설정**
+### **데이터셋**
+- **MNIST**: 0-5 클래스는 이전 태스크, 6-9 클래스는 현재 태스크로 설정.
 
-#### **Teacher 모델**
-- **각 Teacher 모델은 서로 다른 클래스에 대해 독립적으로 학습.**
-- Teacher 모델 수 설정:
-  - **num_teachers = 2**: 
-    Teacher 1은 Task 1, 3, 5를 담당, Teacher 2는 Task 2, 4를 담당.
-  - **num_teachers = 5**:
-    각 Teacher는 하나의 태스크만 전담.
+### **모델**
+- **Teacher 모델**: 이전 태스크에서 학습한 고성능 모델.
+- **Student 모델**: 현재 태스크를 학습하며 Teacher의 지식을 Distillation.
 
-#### **Student 모델**
-- 여러 Teacher 모델의 지식을 결합하여 **모든 태스크를 해결**하도록 학습.
-- **목표**:
-  - 이전 태스크의 지식을 잃지 않으면서도 새로운 태스크 학습 성능을 최적화.
+### **평가지표**
+- **Forgetting (`total_forgetting`)**: 이전 태스크 성능의 감소율.
+- **Accuracy (`test_acc`)**: 이전 및 현재 태스크에서의 분류 정확도.
 
----
-
-### **3. Knowledge Distillation(KD) 기법**
-
-#### **Class Attention Transfer (CAT)**:
-- Teacher와 Student 간의 Attention Map 비교를 기반으로 Distillation Loss를 계산.
-- Teacher의 CAM 정보와 Student의 Feature Map을 비교하여 지식 전달.
-
-#### **기타 KD 기법**:
-- **Logit Matching**: Teacher와 Student의 로짓(Logits)을 비교.
-- **Feature Matching**: Teacher와 Student의 중간 Feature Map 비교.
+### **주요 변수**
+- `lambda_ewc`: Regularization 강도.
+- `temperature`: Softmax Temperature 조정.
+- `exemplar_store_size`: Exemplar Replay 크기.
+- `generator_num_epochs`: Generator 학습 Epoch.
 
 ---
 
-### **4. Regularization 및 Replay 기법**
+## **3. 주요 결과**
 
-- **Elastic Weight Consolidation (EWC)**:
-  - 이전 태스크에서 중요했던 파라미터를 보존하기 위한 Regularization 손실.
-- **Exemplar Replay**:
-  - 이전 태스크 데이터를 일부 저장하고 학습 시 활용.
-- **Data-Free KD**:
-  - 가상 데이터를 생성하는 Generator를 활용해 Teacher-Student 학습에 사용.
-
----
-
-## **실험 시나리오**
-
-### **1. 학습 과정**
-- 학습 순서: Task 1 → Task 2 → Task 3 → Task 4 → Task 5.
-- **각 Task에서 진행**:
-  - Teacher 모델은 해당 태스크 데이터를 학습.
-  - Student 모델은 Teacher 모델의 정보를 활용하여 모든 태스크를 해결하도록 학습.
-
-### **2. 평가 방식**
-- **Test Accuracy**:
-  - 각 Task 학습 완료 후, Student 모델의 성능을 해당 Task와 이전 Task에서 측정.
-- **Catastrophic Forgetting**:
-  - Forgetting Metric을 활용해 이전 Task 성능 감소율을 계산.
-
-### **3. 실험 비교**
-- Teacher 모델 수(num_teachers = 2 vs. num_teachers = 5)에 따른 성능 차이 분석.
-- CAT 기반 KD 기법 **사용** vs. **미사용**:
-  - 기존 KD 방식(Logit Matching, Feature Matching 등)과 CAT 기반 KD의 성능 비교.
-- **Regularization 및 Replay 기법 효과**:
-  - EWC, Exemplar Replay, Data-Free KD 등과 결합 시 성능 변화 평가.
+### **1. Lambda EWC**
+- **효과**: Forgetting 감소에 가장 효과적인 변수.
+- **결과**:
+  - Lambda 값이 증가할수록 Forgetting 감소 효과가 뚜렷.
+  - 1000~5000 범위에서 Accuracy와 Forgetting의 균형이 가장 이상적.
+  - 너무 높은 값(10000)에서는 Accuracy가 감소.
 
 ---
 
-## **결과 측정**
-
-### **1. 주요 지표**
-- **Test Accuracy**:
-  - Student 모델의 최종 성능을 태스크별로 측정.
-- **Forgetting Metric**:
-  - 이전 태스크에서 정확도 감소율 분석.
-- **Loss 변화**:
-  - Classification Loss, Distillation Loss, Regularization Loss 비교.
-
-### **2. 결과 저장 및 시각화**
-- **CSV 저장**: 모든 실험 결과를 `results_store.csv`에 저장.
-- **시각화**: 각 실험의 테스트 정확도를 그래프로 비교.
+### **2. Temperature**
+- **효과**: 낮은 Temperature 값에서 안정적인 성능.
+- **결과**:
+  - 낮은 값(1)에서 Accuracy가 가장 높고 Forgetting이 최소화.
+  - 값이 증가하면 Forgetting이 증가하고 Accuracy가 감소.
 
 ---
 
-## **실험 결과 해석**
+### **3. Exemplar Store Size**
+- **효과**: Store Size 증가로 Forgetting 감소와 Accuracy 향상.
+- **결과**:
+  - Store Size가 커질수록 Forgetting이 감소하고 Accuracy가 상승.
+  - Store Size가 500 이상일 때 성능이 안정화.
 
-1. **Teacher-Student 기반 Continual Learning 가능성 검증**  
-   - Teacher 여러 개의 분리된 지식을 Student 모델이 성공적으로 통합하여 CL을 가능하게 할 수 있는지 분석.
+---
+
+### **4. Generator Epochs**
+- **효과**: Accuracy 향상에 기여.
+- **결과**:
+  - Epochs가 증가할수록 Accuracy는 상승.
+  - Forgetting은 Epochs가 많아질수록 소폭 증가.
+
+---
+
+### **5. Replay Method와 데이터 증강**
+- **효과**: MNIST 데이터셋에서의 제한적 효과.
+- **결과**:
+  - Replay Method(Exemplar, Generative)는 MNIST 데이터셋에서 Forgetting 감소에 비효율적.
+  - 복잡한 데이터셋에서는 추가적인 효과 검증 필요.
+
+---
+
+### **6. Teacher와 Student 모델 깊이**
+- **결과**:
+  - MNIST와 같은 단순 데이터셋에서 모델 깊이를 조절하면 과적합 발생.
+  - 단순한 모델 구성으로도 충분한 성능 발휘.
+
+
+---
+
+## **4. 결론 및 제안**
+
+### **결론**
+1. **Lambda EWC**와 **Temperature**는 Forgetting 감소와 Accuracy 향상에 중요한 변수로 작용.
+2. 적절한 설정(`lambda_ewc=1000~5000`, `temperature=1`)으로 안정적인 성능 확보.
+3. Replay Method는 MNIST에서는 효과가 제한적이며, 복잡한 데이터셋에서 추가 검증이 필요.
+
+---
+
+
+### **제안**
+1. **복잡한 데이터셋 실험**:
+   - CIFAR-10, CIFAR-100 등 고복잡도 데이터셋에서 Replay Method 및 CAT 성능 검증.
+2. **상호작용 분석**:
+   - Lambda EWC, Temperature, Exemplar Store Size 간의 상호작용 효과 추가 분석.
+3. **학습 효율성 검토**:
+   - Teacher와 Student 모델의 크기와 구조가 복잡한 데이터셋에서도 동일한 효과를 보이는지 확인.
+
+---
+
+## **첨부 시각화**
+- 각 변수(`lambda_ewc`, `temperature`, `exemplar_store_size`, `generator_num_epochs`)가 Test Accuracy와 Total Forgetting에 미치는 영향을 그래프로 정리.
+- 주요 시각화:
+  1. Lambda EWC
+![d4a6a46a-e258-474a-a33e-28e8a952fda5](https://github.com/user-attachments/assets/7f6cafa2-fdcd-4991-be87-7c0b4438000d)
+![bc0bcce0-3d3f-4dd7-a188-3eb9b79e9c9c](https://github.com/user-attachments/assets/79ebbd78-bfbb-4759-9ac9-36f2e17137c9)
+  3. Temperature
+  4. Exemplar Store Size
+  5. Generator Epochs
+
