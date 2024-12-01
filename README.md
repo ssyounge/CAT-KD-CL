@@ -1,7 +1,3 @@
-아래는 깃허브 README 형식으로 변환한 내용입니다. 각 섹션을 깔끔하게 정리하여 바로 사용할 수 있도록 작성하였습니다.
-
----
-
 # **Class Attention Transfer 기반 Continual Learning**
 
 ## **1. 연구 목적**
@@ -93,11 +89,9 @@
 
 
 ### **제안**
-1. **복잡한 데이터셋 실험**:
-   - CIFAR-10, CIFAR-100 등 고복잡도 데이터셋에서 Replay Method 및 CAT 성능 검증.
-2. **상호작용 분석**:
+1. **상호작용 분석**:
    - Lambda EWC, Temperature, Exemplar Store Size 간의 상호작용 효과 추가 분석.
-3. **학습 효율성 검토**:
+2. **학습 효율성 검토**:
    - Teacher와 Student 모델의 크기와 구조가 복잡한 데이터셋에서도 동일한 효과를 보이는지 확인.
 
 ---
